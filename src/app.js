@@ -1,13 +1,12 @@
 //make pizza order app
 
 //welcome text: Welcome to Spicy Pizza app. 
-//question 1: Size of pizza? - small medium large, family ( 6/ 10/ 14/ 16)
-//question 2: vegan/ vegetarian/ omnivore. -- if any hide corresponding items
-//question 3: base? tomato / bbq / white sauce
-//question 4: cheese: vegan/ mozzarella
-//question 5: toppings: pepperoni, ham, bacon, tuna, sweetcorn, pineapple, mushrooms, oninons, red pepper (1.6 each)
-//question 6: extra dipping? ketchup/ spicy sauce/ herb oil
-//question 7: add notes
+//question 1: what would you like to do?
+//question 2: Size of pizza? - small medium large, family ( 6/ 10/ 14/ 16)
+//question 2: Type of pizza: vegan/ vegetarian/ omnivore. -- if any hide corresponding items
+//question 3: delivery or pickup?
+//question 4: If delivery, add adrdress
+
 
 //at the end print the whole order with all the selected items listed. -- "You ordered a .....pizza. Total to pay:.... 
 //At exit: --If really hungry, plase call Domino's to place a real order :)"
@@ -17,81 +16,46 @@ const figlet = require('figlet');
 const inquirer = require('inquirer');
 const chalk = require('chalk');
 const dateTime = require('date-time');
-const {addNote, listNotes, removeNote} = require("../utils/notes");
+const {addNote, listNotes, removeNote, saveNotes} = require("../utils/notes");
 
 
 const topLevelQuestion = [
     { type: "list",
     name: "options",
-    message: "The size of your pizza?",
+    message: "What would you like to do?",
+    choices: ["add", "list", "remove", "exit"] }
+]; 
+
+const sizeQuestion = [
+    { type: "checkbox",
+    name: "size",
+    message: "What size should have your pizza",
     choices: ["small", "medium", "large", "family"] }
 ]; 
 
-
-const pizzaType = [
-    { type: "list",
-    name: "type",
-    message: "Would you like a vegan/ vegetarian/ omnivore pizza",
-    default: "omnivore",
-    choices: ["vegan", "medium", "vegetarian", "omnivore"] 
-    }
-];
-
-const baseType = [
-    {type: "checkbox",
-    name:"base",
-    message: "What base sauce do you prefer?",
-    default: "tomato",
-    choices: ["tomato", "BBQ", "white sauce"] 
-    }
-];
-
-const cheeseType = [
+const typeQuestion = [
     {type: "list",
-    name: "cheese",
-    message: "Select your prefered cheese..",
-    choices: ["mozzarella", "vegan cheese", "no cheese, please"] 
+    name: "type",
+    message: "What type of pizza would you like",
+    choices: ["Margherita (vegetarian)", "Diavola (Spicy)", "Pescha (pescatarian)", "Primavera (vegan)", "Quattro Stagioni"]
     }
 ];
-
-const toppings = [
-    {type: "checkbox",
-    name: "toppings",
-    message: "Select your prefered toppings. £1.60 eaach",
-    choices: ["mozzarella", "vegan cheese", "no cheese, please"] 
-    }    
-];
-
-const extraSauce = [
+const deliveryQuestion = [
     {type: 'confirm',
-    name:'sauce', 
-    message:'Would you like extra sauce',
+    name: "delivery",
+    message: "Is this for delivery?"
     }
 ];
-const wantSauce = [
-    {type: "checkbox",
-    name: "extraSauce",
-    message: "Select your extra sauce. £1.60 eaach",
-    choices: ["mozzarella", "vegan cheese", "no cheese, please"] 
-    }    
-];
 
-const addComments = [
+const addAddress = [
     {type: 'input',
-    name:'comments', 
-    message:'Please add delivery address'
+    name:'address', 
+    message:'Please add delivery address: '
     }
 ];
-
-const removeItem= [
-    {type: 'number',
-    name:'remove', 
-    message:'what would you like to remove? Please type a number'
-    }
-]
 
 const main = () => {
-    console.log(chalk.blue(figlet.textSync('Notes App', {
+    console.log(chalk.blue(figlet.textSync('Wlcome to Pizza Order App', {
     width: 80})));
     app();
 };
@@ -100,10 +64,33 @@ const main = () => {
 const app = async () => {
     const answers = await inquirer.prompt(topLevelQuestion);
     if (answers.options == "add") {
-        const answer = await inquirer.prompt(addQuestion);
-        addNote(answer.add);
+
+        const answer = await inquirer.prompt(sizeQuestion);
+        saveNotes(answer.add);
+        if (answer.size == "small"|| answer.size == "medium"|| answer.size == "large"|| answer.size =="family") {
+            addNote(answer.size,1);
+
+            const answer = await inquirer.prompt(typeQuestion);
+            if (answer.type == "Margherita (vegetarian)" || answer.type == "Diavola (Spicy)"|| answer.type== "Pescha (pescatarian)"|| answer.type == "Primavera (vegan)" || answer.type == "Quattro Stagioni") {
+                addNote(answer.type);
+
+                const answer = await inquirer.prompt(deliveryQuestion);
+                if (true) {
+                    const answer = await inquirer.prompt(addAddress);
+                    addNote(answer.address); 
+                } else {
+                    console.log("local pickup");
+                };
+                app();
+            };
+
+        };
+            
+
+        
 
         app();
+        
     } else if (answers.options == "list") {
         listNotes();
         app() ;
