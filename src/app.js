@@ -23,7 +23,7 @@ const topLevelQuestion = [
     { type: "list",
     name: "options",
     message: "What would you like to do?",
-    choices: ["add", "list", "remove", "exit"] }
+    choices: ["order", "list", "remove", "exit"] }
 ]; 
 
 const sizeQuestion = [
@@ -55,13 +55,35 @@ const addAddress = [
 ];
 
 const main = () => {
-    console.log(chalk.blue(figlet.textSync('Wlcome to Pizza Order App', {
+    console.log(chalk.blue(figlet.textSync('Welcome to Pizza Order App', {
     width: 80})));
     app();
 };
 
-
 const app = async () => {
+    const answers = await inquirer.prompt(topLevelQuestion);
+    if (answers.options == "order") {
+        const answer = await inquirer.prompt(typeQuestion);
+        addNote(answer.type);
+
+        app();
+    } else if (answers.options == "list") {
+        listNotes();
+        app() ;
+
+    } else if (answers.options == "remove") {
+        listNotes()
+        const answer = await inquirer.prompt(removeQuestion);
+        removeNote(answer.remove);
+        app() ;
+
+    } else if (answers.options == "exit") {
+        console.log("ok, bye!");
+    }
+};
+
+main();
+/*const app = async () => {
     const answers = await inquirer.prompt(topLevelQuestion);
     if (answers.options == "add") {
 
@@ -106,4 +128,4 @@ const app = async () => {
     }
 };
 
-main();
+main();*/
